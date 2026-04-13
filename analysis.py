@@ -136,8 +136,7 @@ def generate_findings(rep_df, fm, model_fm=None):
 
         if fm["di_flag"]:
             findings.append(("warning",
-                f"Disparate impact ratio of {fm['disparate_impact_ratio']} is below the 0.8 threshold. "
-                "This dataset may not meet the standard used in U.S. employment discrimination law."))
+                f"Disparate impact ratio of {fm['disparate_impact_ratio']} is below the 0.8 threshold. "))
         else:
             findings.append(("ok",
                 f"Disparate impact ratio of {fm['disparate_impact_ratio']} is above the 0.8 threshold."))

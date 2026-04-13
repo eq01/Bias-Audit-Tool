@@ -18,7 +18,7 @@ st.set_page_config(
 st.title("Bias Audit Tool")
 st.caption(
     "Upload a dataset to detect demographic imbalance, underrepresented groups, "
-    "and fairness gaps — in raw data and in a trained model's predictions."
+    "and fairness gaps in raw data and in a trained model's predictions."
 )
 
 with st.sidebar:
@@ -169,7 +169,7 @@ if label_col:
         m1, m2, m3 = st.columns(3)
 
         def metric_status(flagged):
-            return "🔴 Flagged" if flagged else "🟢 Passed"
+            return "Flagged" if flagged else "Passed"
 
         m1.metric(
             "Demographic parity difference",
