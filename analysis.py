@@ -1,7 +1,11 @@
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+api_key = os.environ.get("OPENAI_API_KEY", "")
 
 def label_rate_by_group(df, demo_col, label_col):
     le = LabelEncoder()
@@ -46,7 +50,7 @@ def fairness_metrics(df, demo_col, label_col):
 
 
 def get_ai_summary(metrics, demo_col, label_col):
-    client = OpenAI()
+    client = OpenAI(api_key=os.getenv("KEY"))
     prompt = f"""You are a fairness and bias analyst. Write a clear 3-paragraph summary for a writing class presentation.
 
 Dataset context:
@@ -61,7 +65,7 @@ Cover: what the disparity means in plain English, how serious it is in real-worl
 Write in paragraphs. No bullet points. No headers. Accessible to a non-technical audience."""
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         max_tokens=600,
         messages=[{"role": "user", "content": prompt}]
     )
