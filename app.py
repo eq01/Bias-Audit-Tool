@@ -7,6 +7,7 @@ from analysis import (
 )
 import os
 
+# get the key
 api_key = os.getenv("KEY")
 
 st.set_page_config(
@@ -18,11 +19,13 @@ st.title("Bias Audit Tool")
 
 st.caption(
     "Upload a dataset to detect demographic imbalance, underrepresented groups, "
-    "and fairness gaps in raw data and in a trained model's predictions."
+    "and fairness gaps in raw data"
 )
 
+# get the uploaded file if there is one
 uploaded = st.file_uploader("Upload your CSV", type="csv")
 
+# else default to the sample data provided
 if not uploaded:
     if st.button("Use sample data (Adult Income Dataset)"):
         df_sample = pd.read_csv("sample_data/adult.csv")
@@ -44,15 +47,15 @@ if df is not None:
     with col2:
         label_col = st.selectbox("Outcome label column", df.columns)
 
-    # Warnings
+    # warnings
     if pd.api.types.is_numeric_dtype(df[demo_col]) and df[demo_col].nunique() > 10:
         st.warning(
-            f"⚠️ '{demo_col}' has {df[demo_col].nunique()} unique numeric values — try a categorical column like `sex` or `race`, or bin it into groups first.")
+            f" '{demo_col}' has {df[demo_col].nunique()} unique values, try a categorical column like `sex` or `race`")
 
     if not is_binary_label(df[label_col]):
         unique_vals = df[label_col].dropna().unique().tolist()
         st.error(
-            f"⚠️ '{label_col}' has {df[label_col].nunique()} unique values {unique_vals[:6]}{'...' if len(unique_vals) > 6 else ''}. The audit requires a binary label — pick a column with exactly 2 outcomes (e.g. hired/not hired, approved/denied, 0/1).")
+            f" '{label_col}' has {df[label_col].nunique()} unique values {unique_vals[:6]}{'...' if len(unique_vals) > 6 else ''}. The audit requires a binary label so pick a column with exactly 2 outcomes (e.g. hired/not hired, approved/denied, 0/1).")
 
     nan_demo = df[demo_col].isna().sum()
     nan_label = df[label_col].isna().sum()
@@ -74,7 +77,7 @@ if df is not None:
 
         st.pyplot(plot_group_rates(metrics["all_rates"], demo_col, label_col))
 
-        # AI summary
+        # ai summary
         if api_key:
             st.subheader("Analysis")
             with st.spinner("Generating summary..."):

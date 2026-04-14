@@ -4,9 +4,11 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
+# read and access api key from file
 load_dotenv()
 api_key = os.environ.get("OPENAI_API_KEY", "")
 
+# calculates the positive outcome rate of each group
 def label_rate_by_group(df, demo_col, label_col):
     le = LabelEncoder()
     df = df.copy()
@@ -16,10 +18,12 @@ def label_rate_by_group(df, demo_col, label_col):
     return rates, le.classes_
 
 
+# checks if the label col has two unique values
 def is_binary_label(series):
     return series.dropna().nunique() == 2
 
 
+# calculates fairness metrics (demographic parity, disparate impact, group size ratio)
 def fairness_metrics(df, demo_col, label_col):
     # drop nan rows in either column
     df = df.dropna(subset=[demo_col, label_col])
@@ -49,6 +53,7 @@ def fairness_metrics(df, demo_col, label_col):
     }
 
 
+# get ai summary from openai model
 def get_ai_summary(metrics, demo_col, label_col):
     client = OpenAI(api_key=os.getenv("KEY"))
     prompt = f"""You are a fairness and bias analyst. Write a clear 3-paragraph summary for a writing class presentation.
@@ -72,6 +77,7 @@ Write in paragraphs. No bullet points. No headers. Accessible to a non-technical
     return response.choices[0].message.content
 
 
+# helper for plotting the rates calculated
 def plot_group_rates(rates, demo_col, label_col):
     fig, ax = plt.subplots(figsize=(7, 3.5))
     ax.barh(rates["group"].astype(str), rates["positive_rate"], color="#4c72b0", height=0.5)
@@ -80,6 +86,7 @@ def plot_group_rates(rates, demo_col, label_col):
     ax.set_xlabel(f"Positive rate in '{label_col}'")
     ax.set_title(f"Outcome rate by {demo_col}")
     ax.legend()
+
     for i, val in enumerate(rates["positive_rate"]):
         ax.text(val + 0.005, i, f"{val:.1%}", va="center", fontsize=9)
     ax.set_xlim(0, rates["positive_rate"].max() * 1.25)
